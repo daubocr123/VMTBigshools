@@ -25,5 +25,7 @@ namespace VMT_BigSchools.ViewModels
         {
             return DateTime.Parse(string.Format("{0} {1}", Date, Time));
         }
+        public IEnumerable<Course> UpcomingCourses { get; set; }
+        public bool ShowAction { get; set; }
     }
 }

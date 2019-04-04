@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using VMT_BigSchools.Models;
 using System.Data.Entity;
+using VMT_BigSchools.ViewModels;
 
 namespace VMT_BigSchools.Controllers
 {
@@ -20,8 +21,14 @@ namespace VMT_BigSchools.Controllers
             var upcomingCourses = _dbContext.Courses
                 .Include(c => c.Lecturer)
                 .Include(c => c.Category)
-                .Where(c => c.DateTime > DateTime.Now); 
-            return View(upcomingCourses);
+                .Where(c => c.DateTime > DateTime.Now);
+
+            var viewModel = new CourseViewModel
+            {
+                UpcomingCourses = upcomingCourses,
+                ShowAction = User.Identity.IsAuthenticated
+            }; 
+            return View(viewModel);
         }
 
         public ActionResult About()
