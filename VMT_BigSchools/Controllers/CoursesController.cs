@@ -23,7 +23,8 @@ namespace VMT_BigSchools.Controllers
         {
             var viewModel = new CourseViewModel
             {
-                Categories = _dbContext.Categories.ToList()
+                Categories = _dbContext.Categories.ToList(),
+                Heading ="Add Course"
             };
             return View(viewModel);
         }
@@ -80,6 +81,45 @@ namespace VMT_BigSchools.Controllers
                 .ToList();
 
             return View(courses);
+        }
+        [Authorize]
+        public ActionResult Edit(int id)
+        {
+            var userId = User.Identity.GetUserId();
+            var courses = _dbContext.Courses.Single(c => c.Id == id && c.LecturerId == userId);
+
+            var viewModel = new CourseViewModel
+            {
+                Categories = _dbContext.Categories.ToList(),
+                Date = courses.DateTime.ToString("dd/M/yyyy"),
+                Time = courses.DateTime.ToString("HH:mm"),
+                Category =courses.CategoryId,
+                Place =courses.Place,
+                Heading ="Edit Course",
+                Id = courses.Id
+            };
+            return View("Create", viewModel);
+        }
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Update(CourseViewModel viewModel)
+        {
+            if(!ModelState.IsValid)
+            {
+                viewModel.Categories = _dbContext.Categories.ToList();
+                return View("Create", viewModel);
+            }
+            var userId = User.Identity.GetUserId();
+            var courses = _dbContext.Courses.Single(c => c.Id == viewModel.Id && c.LecturerId == userId);
+
+            courses.Place = viewModel.Place;
+            courses.DateTime = viewModel.GetDateTime();
+            courses.CategoryId = viewModel.Category;
+
+            _dbContext.SaveChanges();
+
+            return RedirectToAction("Index", "Home");
         }
     }
 }
